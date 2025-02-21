@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Https test.sln"
+    "dotnet.defaultSolution": "Apis_Project2.sln"
 }

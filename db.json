@@ -1,0 +1,82 @@
+{
+    "characters": [
+        {
+            "id": 1,
+            "name": "Survivor",
+            "status": "Vivo",
+            "species": "Slugcat",
+            "type": "Sobreviviente",
+            "gender": "Desconocido",
+            "origin": {
+                "name": "Superficie",
+                "url": "https://rainworld.fandom.com/wiki/Slugcat"
+            },
+            "image": "https://rainworld.fandom.com/wiki/Special:FilePath/Slugcat_Render.png"
+        },
+        {
+            "id": 2,
+            "name": "The Hunter",
+            "status": "Vivo",
+            "species": "Slugcat",
+            "type": "Depredador",
+            "gender": "Desconocido",
+            "origin": {
+                "name": "Región Salvaje",
+                "url": "https://rainworld.fandom.com/wiki/The_Hunter"
+            },
+            "image": "https://rainworld.fandom.com/wiki/Special:FilePath/Hunter_Render.png"
+        },
+        {
+            "id": 3,
+            "name": "The Monk",
+            "status": "Vivo",
+            "species": "Slugcat",
+            "type": "Pacifista",
+            "gender": "Desconocido",
+            "origin": {
+                "name": "Templo del Este",
+                "url": "https://rainworld.fandom.com/wiki/The_Monk"
+            },
+            "image": "https://rainworld.fandom.com/wiki/Special:FilePath/Monk_Render.png"
+        },
+        {
+            "id": 4,
+            "name": "The Saint",
+            "status": "Vivo",
+            "species": "Slugcat",
+            "type": "Asceta",
+            "gender": "Desconocido",
+            "origin": {
+                "name": "Cumbres Altas",
+                "url": "https://rainworld.fandom.com/wiki/The_Saint"
+            },
+            "image": "https://rainworld.fandom.com/wiki/Special:FilePath/Saint_Render.png"
+        },
+        {
+            "id": 5,
+            "name": "Five Pebbles",
+            "status": "Activo",
+            "species": "Iterator",
+            "type": "Máquina Pensante",
+            "gender": "N/A",
+            "origin": {
+                "name": "Estructura de Five Pebbles",
+                "url": "https://rainworld.fandom.com/wiki/Five_Pebbles"
+            },
+            "image": "https://rainworld.fandom.com/wiki/Special:FilePath/FivePebbles_Render.png"
+        },
+        {
+            "id": 6,
+            "name": "Looks to the Moon",
+            "status": "Dañado",
+            "species": "Iterator",
+            "type": "Máquina Pensante",
+            "gender": "N/A",
+            "origin": {
+                "name": "Estructura de Looks to the Moon",
+                "url": "https://rainworld.fandom.com/wiki/Looks_to_the_Moon"
+            },
+            "image": "https://rainworld.fandom.com/wiki/Special:FilePath/LooksToTheMoon_Render.png"
+        }
+    ]
+}
