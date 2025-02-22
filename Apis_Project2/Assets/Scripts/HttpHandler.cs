@@ -1,124 +1,193 @@
 using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections;
-using UnityEngine.UI;
-using UnityEditor.PackageManager.Requests;
-using TMPro;
-using System;
+using TMPro;  // <-- Importar TextMeshPro
 
-public class HttpHandler :  MonoBehaviour
+public class API_Manager : MonoBehaviour
 {
     [SerializeField]
-    private RawImage[] images;
+    private string rickMortyUrl = "https://rickandmortyapi.com/api/character"; 
 
     [SerializeField]
-    private string url = "https://rickandmortyapi.com/api/character";
-    public void SendRequest()
+    private string rainWorldUrl = "https://raw.githubusercontent.com/LuisaRoech/APIS_Proyecto2/refs/heads/main/db.json";
+
+    [SerializeField] private TMP_Dropdown apiDropdown;
+    [SerializeField] private TMP_Dropdown idDropdown;
+
+    [SerializeField] private Card[] cards; 
+    private string selectedUrl; 
+
+    void Start()
     {
-        StartCoroutine("GetUser", 1);
+        HandleAPIDropdownValueChanged(apiDropdown.value);
+        apiDropdown.onValueChanged.AddListener(HandleAPIDropdownValueChanged);
+        idDropdown.onValueChanged.AddListener(HandleIDDropdownValueChanged);
     }
 
-    IEnumerator GetCharacters()
+    private void HandleAPIDropdownValueChanged(int value)
     {
-        UnityWebRequest www = UnityWebRequest.Get(url);
+        switch (value)
+        {
+            case 0:
+                selectedUrl = rickMortyUrl;
+                break;
+            case 1:
+                selectedUrl = rainWorldUrl;
+                break;
+            default:
+                selectedUrl = rickMortyUrl;
+                break;
+        }
+        Debug.Log("API seleccionada: " + selectedUrl);
+
+        // Recargar opciones del Dropdown de IDs
+        StartCoroutine(LoadIDs());
+    }
+
+    private void HandleIDDropdownValueChanged(int value)
+    {
+        Debug.Log("ID seleccionado: " + idDropdown.options[value].text);
+    }
+
+    public void SendRequest(int cardIndex)
+    {
+        if (idDropdown.options.Count == 0)
+        {
+            Debug.Log("No hay IDs disponibles");
+            return;
+        }
+
+        int id = int.Parse(idDropdown.options[idDropdown.value].text);
+        StartCoroutine(GetCharacter(id, cardIndex));
+    }
+
+    IEnumerator LoadIDs()
+    {
+        UnityWebRequest www = UnityWebRequest.Get(selectedUrl);
         yield return www.SendWebRequest();
 
-        if(www.result == UnityWebRequest.Result.ConnectionError)
+        if (www.result == UnityWebRequest.Result.ConnectionError)
         {
-          Debug.Log(www.error);
+            Debug.Log(www.error);
         }
         else
         {
-            if(www.responseCode == 200)
+            idDropdown.ClearOptions();
+            if (selectedUrl == rickMortyUrl)
             {
-                FakeUser user = JsonUtility.FromJson<FakeUser>(www.downloadHandler.text);
-
-                GameObject.Find("username").GetComponent<TMP_Text>().text = user.username;
-                Console.WriteLine(user.username);
-                for(int i = 0; i < user.deck.Length; i++)
+                RickAndMortyResponse response = JsonUtility.FromJson<RickAndMortyResponse>(www.downloadHandler.text);
+                foreach (var character in response.results)
                 {
-                    var cardId = user.deck[i];
-                    StartCoroutine(GetCharacter(cardId,i));
-
+                    idDropdown.options.Add(new TMP_Dropdown.OptionData(character.id.ToString()));
                 }
-                
             }
-            else{
-                string mensaje = "status:" + www.responseCode;
-                mensaje += "\nError:" + www.error;
-                Debug.Log(mensaje);
+            else if (selectedUrl == rainWorldUrl)
+            {
+                CharactersList characterList = JsonUtility.FromJson<CharactersList>(www.downloadHandler.text);
+                foreach (var character in characterList.characters)
+                {
+                    idDropdown.options.Add(new TMP_Dropdown.OptionData(character.id.ToString()));
+                }
             }
+            idDropdown.RefreshShownValue();
         }
     }
 
-     IEnumerator GetCharacter(int id, int index)
+    IEnumerator GetCharacter(int id, int cardIndex)
     {
-        UnityWebRequest www = UnityWebRequest.Get(url+ "/"+ id);
+        string requestUrl = selectedUrl + (selectedUrl == rickMortyUrl ? "/" + id : "");
+
+        UnityWebRequest www = UnityWebRequest.Get(requestUrl);
         yield return www.SendWebRequest();
 
-        if(www.result == UnityWebRequest.Result.ConnectionError)
+        if (www.result == UnityWebRequest.Result.ConnectionError)
         {
-          Debug.Log(www.error);
+            Debug.Log(www.error);
         }
         else
         {
-            if(www.responseCode == 200)
+            if (www.responseCode == 200)
             {
-                Character character = JsonUtility.FromJson<Character>(www.downloadHandler.text);
-                Debug.Log($"{character.id}:{character.name} is a {character.species}");
-                StartCoroutine(GetImage(character.image,index));
+                if (selectedUrl == rickMortyUrl)
+                {
+                    Character character = JsonUtility.FromJson<Character>(www.downloadHandler.text);
+                    StartCoroutine(GetImage(character.image, character, cardIndex));
+                }
+                else if (selectedUrl == rainWorldUrl)
+                {
+                    CharactersList characterList = JsonUtility.FromJson<CharactersList>(www.downloadHandler.text);
+                    Character foundCharacter = System.Array.Find(characterList.characters, c => c.id == id);
 
+                    if (foundCharacter != null)
+                    {
+                        StartCoroutine(GetImage(foundCharacter.image, foundCharacter, cardIndex));
+                    }
+                    else
+                    {
+                        Debug.Log("Personaje no encontrado en Rain World con ID: " + id);
+                    }
+                }
             }
-            else if (www.responseCode == 404)
+            else
             {
-                string mensaje = "status:" + www.responseCode;
-                mensaje += "\nError:" + www.error;
-                Debug.Log(mensaje);
+                Debug.Log("Error: " + www.responseCode + " - " + www.error);
             }
         }
     }
 
-    IEnumerator GetImage(string imageUrl, int index)
+    IEnumerator GetImage(string imageUrl, Character character, int cardIndex)
     {
         UnityWebRequest request = UnityWebRequestTexture.GetTexture(imageUrl);
         yield return request.SendWebRequest();
 
-        if(request.result == UnityWebRequest.Result.ConnectionError)
+        if (request.result == UnityWebRequest.Result.ConnectionError)
         {
             Debug.Log(request.error);
         }
         else
         {
-            var texture = ((DownloadHandlerTexture) request.downloadHandler).texture;
-
-            if (index >= 0 && index < images.Length)
-            {
-                images[index].texture = texture;
-            } 
-            else 
-            {
-                Debug.LogError($"Index {index} is out of range for images array (size {images.Length})");
-            }
-
+            var texture = ((DownloadHandlerTexture)request.downloadHandler).texture;
+            UpdateCard(character, texture, cardIndex);
         }
-
     }
-}
 
-[System.Serializable]
-public class Character
-{
-    public int id;
-    public string name;
-    public string species;
-    public string image;
-}
+    private void UpdateCard(Character character, Texture2D texture, int cardIndex)
+    {
+        if (cardIndex >= 0 && cardIndex < cards.Length)
+        {
+            cards[cardIndex].UpdateCard(character, texture);
+        }
+    }
 
-[System.Serializable]
-public class FakeUser
-{
-   public int id;
-   public string username;
-   public bool state;
-   public int[] deck;
+    [System.Serializable]
+    public class Character
+    {
+        public int id;
+        public string name;
+         public string status;
+        public string type;
+        public string species;
+        public string gender;
+        public string image;
+        public Origin origin;
+    }
+
+    [System.Serializable]
+    public class Origin
+    {
+        public string name;
+        public string url;
+    }
+
+    [System.Serializable]
+    public class CharactersList
+    {
+        public Character[] characters;
+    }
+
+    [System.Serializable]
+    public class RickAndMortyResponse
+    {
+        public Character[] results;
+    }
 }
