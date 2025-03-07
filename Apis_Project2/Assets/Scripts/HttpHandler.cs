@@ -9,7 +9,7 @@ public class API_Manager : MonoBehaviour
     private string rickMortyUrl = "https://rickandmortyapi.com/api/character"; 
 
     [SerializeField]
-    private string rainWorldUrl = "https://raw.githubusercontent.com/LuisaRoech/APIS_Proyecto2/refs/heads/main/db.json";
+    private string rainWorldUrl = "https://github.com/LuisaRoech/APIS_Proyecto2/blob/main/Apis_Project2/Assets/Resources/db.json";
 
     [SerializeField] private TMP_Dropdown apiDropdown;
     [SerializeField] private TMP_Dropdown idDropdown;

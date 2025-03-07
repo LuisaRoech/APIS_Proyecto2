@@ -15,7 +15,7 @@ public class Card : MonoBehaviour
         nameText.text = character.name;
         speciesText.text = character.species;
         typeText.text = character.type;
-        originText.text = character.origin.name; // Corregido: ahora usa `origin.name`
+        originText.text = character.origin.name; 
         characterImage.texture = texture;
     }
 }
